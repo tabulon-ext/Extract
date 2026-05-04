@@ -65,7 +65,7 @@ function extract {
         *.appimage) ./"$n" --appimage-extract ;;
         *.tar.lz4) tar --use-compress-program=lz4 -xvf "$n" ;;
         *.lz4) lz4 -d "$n" ;;
-        *.tar.br) tar --use-compress-program=pbzip2 -xvf "$n" ;;
+        *.tar.br) tar --use-compress-program=brotli -xvf "$n" ;;
         *.bz2) bunzip2 "$n" ;;
         *.cbr | *.rar) unrar x -ad "$n" ;;
         *.gz) gunzip "$n" ;;
