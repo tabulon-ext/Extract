@@ -17,11 +17,10 @@
 # Web:    https://dotoca.net
 # Github: https://github.com/xvoland/Extract/blob/master/extract.sh
 
-
 function extract {
     SAVEIFS=$IFS
     IFS=$' \t\n'
-    set +e  # abort execution on errors
+    set +e # abort execution on errors
 
     if [ $# -eq 0 ]; then
         # display usage if no parameters given
@@ -31,7 +30,7 @@ function extract {
         return 1
     fi
 
-while [[ $# -gt 0 ]]; do
+    while [[ $# -gt 0 ]]; do
         n="$1"
         shift
 
@@ -45,7 +44,7 @@ while [[ $# -gt 0 ]]; do
             shift
 
             tmpfile=$(mktemp "/tmp/extract.stdin.XXXXXX.$ext")
-            cat > "$tmpfile"
+            cat >"$tmpfile"
             echo "Saved stdin to temp file: $tmpfile"
             extract "$tmpfile"
             rm -f "$tmpfile"
@@ -59,37 +58,41 @@ while [[ $# -gt 0 ]]; do
         fi
 
         case "${n%,}" in
-            *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
-                tar --auto-compress -xvf "$n" ;;
-            *.lzma)      unlzma "$n" ;;
-            *.lz4)       lz4 -d "$n" ;;
-            *.appimage)  ./"$n" --appimage-extract ;;
-            *.tar.lz4)   tar --use-compress-program=lz4 -xvf "$n" ;;
-            *.tar.br)    tar --use-compress-program=pbzip2 -xvf "$n" ;;
-            *.bz2)       bunzip2 "$n" ;;
-            *.cbr|*.rar) unrar x -ad "$n" ;;
-            *.gz)        gunzip "$n" ;;
-            *.cbz|*.epub|*.zip) unzip "$n" ;;
-            *.z)         uncompress "$n" ;;
-            *.7z|*.apk|*.arj|*.cab|*.cb7|*.chm|*.deb|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar|*.vhd)
-                7z x "$n" ;;
-            *.xz)        unxz "$n" ;;
-            *.exe)       cabextract "$n" ;;
-            *.cpio)      cpio -id < "$n" ;;
-            *.cba|*.ace) unace x "$n" ;;
-            *.zpaq)      zpaq x "$n" ;;
-            *.arc)       arc e "$n" ;;
-            *.cso)       ciso 0 "$n" "$n.iso" && extract "$n.iso" && rm -f "$n" ;;
-            *.zlib)      zlib-flate -uncompress < "$n" > "${n%.*zlib}" && rm -f "$n" ;;
-            *.dmg)
-                mnt_dir=$(mktemp -d)
-                hdiutil mount "$n" -mountpoint "$mnt_dir"
-                echo "Mounted at: $mnt_dir" ;;
-            *.tar.zst)   tar -I zstd -xvf "$n" ;;
-            *.zst)       zstd -d "$n" ;;
-            *)
-                echo "extract: '$n' - unknown archive method"
-                continue ;;
+        *.cbt | *.tar.bz2 | *.tar.gz | *.tar.xz | *.tbz2 | *.tgz | *.txz | *.tar)
+            tar --auto-compress -xvf "$n"
+            ;;
+        *.lzma) unlzma "$n" ;;
+        *.appimage) ./"$n" --appimage-extract ;;
+        *.tar.lz4) tar --use-compress-program=lz4 -xvf "$n" ;;
+        *.lz4) lz4 -d "$n" ;;
+        *.tar.br) tar --use-compress-program=pbzip2 -xvf "$n" ;;
+        *.bz2) bunzip2 "$n" ;;
+        *.cbr | *.rar) unrar x -ad "$n" ;;
+        *.gz) gunzip "$n" ;;
+        *.cbz | *.epub | *.zip) unzip "$n" ;;
+        *.z) uncompress "$n" ;;
+        *.7z | *.apk | *.arj | *.cab | *.cb7 | *.chm | *.deb | *.iso | *.lzh | *.msi | *.pkg | *.rpm | *.udf | *.wim | *.xar | *.vhd)
+            7z x "$n"
+            ;;
+        *.xz) unxz "$n" ;;
+        *.exe) cabextract "$n" ;;
+        *.cpio) cpio -id <"$n" ;;
+        *.cba | *.ace) unace x "$n" ;;
+        *.zpaq) zpaq x "$n" ;;
+        *.arc) arc e "$n" ;;
+        *.cso) ciso 0 "$n" "$n.iso" && extract "$n.iso" && rm -f "$n" ;;
+        *.zlib) zlib-flate -uncompress <"$n" >"${n%.*zlib}" && rm -f "$n" ;;
+        *.dmg)
+            mnt_dir=$(mktemp -d)
+            hdiutil mount "$n" -mountpoint "$mnt_dir"
+            echo "Mounted at: $mnt_dir"
+            ;;
+        *.tar.zst) tar -I zstd -xvf "$n" ;;
+        *.zst) zstd -d "$n" ;;
+        *)
+            echo "extract: '$n' - unknown archive method"
+            continue
+            ;;
         esac
     done
 
